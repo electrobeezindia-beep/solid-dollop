@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroFix - Electrician Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .online-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #4caf50;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        /* Stats Container */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        /* Earnings Section */
+        .earnings-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 20px;
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .earnings-section h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .earnings-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .earnings-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Booking Requests */
+        .requests-section {
+            padding: 0 20px;
+        }
+
+        .requests-section h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .request-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .customer-info h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .booking-id {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .distance-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .request-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .detail-item span:first-child {
+            margin-right: 8px;
+        }
+
+        .request-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .accept-btn, .reject-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .accept-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .accept-btn:hover, .reject-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Active Booking */
+        .active-booking {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #ff9800;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-ongoing {
+            background: #4caf50;
+            color: white;
+        }
+
+        .navigation-btn {
+            background: #1976d2;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .complete-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal h2 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚡ Electrician Panel</h1>
+        <div class="online-toggle">
+            <span id="statusText">Offline</span>
+            <div class="toggle-switch" id="onlineToggle">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Container -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <h3>Today's Jobs</h3>
+            <div class="stat-value" id="todayJobs">8</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <h3>Rating</h3>
+            <div class="stat-value">4.8</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✓</div>
+            <h3>Completed</h3>
+            <div class="stat-value" id="completedJobs">156</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <h3>Customers</h3>
+            <div class="stat-value">142</div>
+        </div>
+    </div>
+
+    <!-- Earnings Section -->
+    <div class="earnings-section">
+        <h2>Today's Earnings</h2>
+        <div class="earnings-amount">₹2,840</div>
+        <div class="earnings-details">
+            <span>This Week: ₹12,450</span>
+            <span>This Month: ₹48,200</span>
+        </div>
+    </div>
+
+    <!-- Requests Section -->
+    <div class="requests-section">
+        <h2 id="requestsTitle">New Booking Requests</h2>
+        
+        <div id="requestsContainer">
+            <!-- Sample Request Card -->
+            <div class="request-card" id="request1">
+                <div class="request-header">
+                    <div class="customer-info">
+                        <h3>Priya Sharma</h3>
+                        <div class="booking-id">Booking ID: EF894521</div>
+                    </div>
+                    <div class="distance-badge">1.8 km</div>
+                </div>
+                
+                <div class="request-details">
+                    <div class="detail-item">
+                        <span>🔌</span>
+                        <span><strong>Issue:</strong> Switch/Socket Replacement</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>📍</span>
+                        <span>Sector 15, Noida</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>📞</span>
+                        <span>Phone: +91 98765 43210</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>💵</span>
+                        <span><strong>Payment:</strong> Cash on Service</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>⏰</span>
+                        <span>Requested: 2 minutes ago</span>
+                    </div>
+                </div>
+
+                <div class="request-actions">
+                    <button class="accept-btn" onclick="acceptBooking('request1')">✓ Accept</button>
+                    <button class="reject-btn" onclick="rejectBooking('request1')">✗ Reject</button>
+                </div>
+            </div>
+
+            <!-- Another Sample Request -->
+            <div class="request-card" id="request2">
+                <div class="request-header">
+                    <div class="customer-info">
+                        <h3>Rahul Verma</h3>
+                        <div class="booking-id">Booking ID: EF894522</div>
+                    </div>
+                    <div class="distance-badge">3.2 km</div>
+                </div>
+                
+                <div class="request-details">
+                    <div class="detail-item">
+                        <span>🚨</span>
+                        <span><strong>Issue:</strong> Emergency - Power Outage</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>📍</span>
+                        <span>Sector 22, Noida</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>📞</span>
+                        <span>Phone: +91 98765 43211</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>📱</span>
+                        <span><strong>Payment:</strong> Google Pay</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>⏰</span>
+                        <span>Requested: 5 minutes ago</span>
+                    </div>
+                </div>
+
+                <div class="request-actions">
+                    <button class="accept-btn" onclick="acceptBooking('request2')">✓ Accept</button>
+                    <button class="reject-btn" onclick="rejectBooking('request2')">✗ Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <h3>No Pending Requests</h3>
+            <p>You'll receive notifications when new bookings arrive</p>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📋</div>
+            <div class="nav-label">Bookings</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">💰</div>
+            <div class="nav-label">Earnings</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Profile</div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">✅</div>
+            <h2>Booking Accepted!</h2>
+            <p class="modal-text">Navigate to customer location and start the service.</p>
+            <button class="modal-btn" onclick="closeModal()">Start Navigation</button>
+        </div>
+    </div>
+
+    <script>
+        let isOnline = false;
+        let activeBookings = [];
+
+        // Accept Booking
+        function acceptBooking(requestId) {
+            const requestCard = document.getElementById(requestId);
+            if (!requestCard) return;
+
+            // Add to active bookings
+            activeBookings.push(requestId);
+            
+            // Remove the request card with animation
+            requestCard.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                requestCard.remove();
+                checkEmptyState();
+                updateStats();
+            }, 300);
+
+            // Show success modal
+            document.getElementById('successModal').classList.add('active');
+
+            // Create active booking card
+            createActiveBooking(requestId);
+        }
+
+        // Reject Booking
+        function rejectBooking(requestId) {
+            const requestCard = document.getElementById(requestId);
+            if (!requestCard) return;
+
+            requestCard.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                requestCard.remove();
+                checkEmptyState();
+            }, 300);
+
+            showNotification('Booking rejected');
+        }
+
+        // Create Active Booking Card
+        function createActiveBooking(requestId) {
+            // Get the original request data
+            const originalCard = document.getElementById(requestId);
+            const customerName = originalCard.querySelector('.customer-info h3').textContent;
+            const location = originalCard.querySelector('.detail-item:nth-child(2)').textContent.replace('📍', '').trim();
+            const phone = originalCard.querySelector('.detail-item:nth-child(3)').textContent.replace('📞', '').trim().split(' ')[1] || '+91 98765 43210';
+            const distance = originalCard.querySelector('.distance-badge').textContent;
+            
+            const activeCard = document.createElement('div');
+            activeCard.className = 'request-card active-booking';
+            activeCard.id = 'active-' + requestId;
+            activeCard.innerHTML = `
+                <span class="status-badge status-ongoing">🔄 Ongoing</span>
+                <div class="request-header">
+                    <div class="customer-info">
+                        <h3>${customerName}</h3>
+                        <div class="booking-id">Booking ID: ${requestId.toUpperCase()}</div>
+                    </div>
+                    <div class="distance-badge">${distance}</div>
+                </div>
+                
+                <div class="request-details">
+                    <div class="detail-item">
+                        <span>📍</span>
+                        <span>${location}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>📞</span>
+                        <span>${phone}</span>
+                    </div>
+                </div>
+
+                <button class="navigation-btn" onclick="navigateToCustomer('${location}')">🗺️ Navigate to Customer</button>
+                <button class="complete-btn" onclick="completeBooking(this)">✓ Mark as Completed</button>
+            `;
+
+            document.getElementById('requestsContainer').insertBefore(
+                activeCard, 
+                document.getElementById('requestsContainer').firstChild
+            );
+            
+            document.getElementById('requestsTitle').textContent = 'Active & New Bookings';
+        }
+        
+        // Navigate to Customer
+        function navigateToCustomer(location) {
+            // Extract location name for Google Maps
+            const locationQuery = encodeURIComponent(location);
+            
+            // Try to open in Google Maps app first, fallback to web
+            const googleMapsApp = `google.navigation:q=${locationQuery}`;
+            const googleMapsWeb = `https://www.google.com/maps/dir/?api=1&destination=${locationQuery}`;
+            
+            // Try to detect if mobile
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Try to open in app first
+                window.location.href = googleMapsApp;
+                
+                // Fallback to web after a delay
+                setTimeout(() => {
+                    window.open(googleMapsWeb, '_blank');
+                }, 500);
+            } else {
+                // Desktop - open in new tab
+                window.open(googleMapsWeb, '_blank');
+            }
+            
+            showNotification('Opening navigation to customer location...');
+        }
+
+        // Complete Booking
+        function completeBooking(button) {
+            const card = button.closest('.request-card');
+            card.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                card.remove();
+                updateStats();
+                checkEmptyState();
+                showNotification('Service completed! Payment received.');
+            }, 300);
+        }
+
+        // Check Empty State
+        function checkEmptyState() {
+            const container = document.getElementById('requestsContainer');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (container.children.length === 0) {
+                emptyState.style.display = 'block';
+                document.getElementById('requestsTitle').textContent = 'Booking Requests';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // Update Stats
+        function updateStats() {
+            const todayJobs = parseInt(document.getElementById('todayJobs').textContent);
+            document.getElementById('todayJobs').textContent = todayJobs + 1;
+            
+            const completedJobs = parseInt(document.getElementById('completedJobs').textContent);
+            document.getElementById('completedJobs').textContent = completedJobs + 1;
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // Show Notification
+        function showNotification(message) {
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideDown 0.3s ease;
+            `;
+            toast.textContent = message;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateX(-50%) translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(-50%) translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideDown 0.3s ease reverse';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Slide Out Animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                to {
+                    opacity: 0;
+                    transform: translateX(-100%);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Bottom Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Toggle Online/Offline
+        document.getElementById('onlineToggle').addEventListener('click', function() {
+            isOnline = !isOnline;
+            this.classList.toggle('active');
+            document.getElementById('statusText').textContent = isOnline ? 'Online' : 'Offline';
+            
+            if (isOnline) {
+                // Simulate receiving new requests
+                showNotification('You are now online and will receive booking requests');
+            } else {
+                showNotification('You are now offline');
+            }
+        });
+    </script>
+</body>
+</html>
